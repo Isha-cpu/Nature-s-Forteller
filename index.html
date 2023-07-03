@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> Disaster Prediction </title>
+  <!---Custom Css File!--->
+  <link rel="stylesheet" href="vs.css">
+</head>
+<body>
+  <section class="main">
+  <div class="disaster">
+    <div class="image">
+        <img src="img1.png" class="logo">
+    </div>
+    <div class="data">
+      <h2>Disaster Prediction</h2>
+      <span>Real-time disaster alerts</span>
+    </div>
+    <div class="row">
+        <center>
+            <div ng-app="myApp" ng-controller="myCtrl">
+                <div class="info">
+                    Phone Number: <input type="text" ng-model="phno">
+                </div>
+                <div class="info">
+                    Location: <input type="text" ng-model="location">
+                </div>
+                <div ng-bind="phno"> </div>
+                <div ng-bind="location"> </div>
+                <div class="raw">
+                    <div class="container3 column">
+                    </div> 
+                    <div class="container2 column">
+                    </div>
+                    <div class="container1 column">
+                    </div>
+                </div>
+                <button class="buttons" ng-click="SubmitVals()">Submit</button>
+                <br>
+                <div class="text">We use your phone number to deliver SMS alerts about potential calamities in your area.</div>
+                <div class="add"><a href="https://github.com/Isha-cpu/Nature-s-Forteller">Know More</a></div>
+                <div class="add">Data: </div>
+            </div>
+        </center>
+    </div>
+</section>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+$scope.SubmitVals = function() {
+console.log($scope.phno);
+$http({
+    method : "GET",
+    url : "/api/addnumloc/"+$scope.phno+"/"+$scope.location
+}).then((response) => {
+    console.log(response.data);
+    $scope.data2 = response.data;
+    $(".container1").append(renderjson.set_show_by_default(true).set_max_string_length(100)([$scope.data2]));
+    $http({
+        method : "GET",
+        url : "/api/weather/"+$scope.phno
+    }).then((response) => {
+        $scope.data1 = response.data;
+        $scope.city = "India";
+        $(".container2").append(renderjson.set_show_by_default(true).set_max_string_length(100).set_show_to_level(4)([$scope.data1]));
+        $http({
+            method : "GET",
+            url : "/api/relief/"+$scope.city
+        }).then((response) => {
+            $scope.data0 = response.data;
+            $(".container3").append(renderjson.set_show_by_default(true).set_max_string_length(100).set_show_to_level(5)([$scope.data0]));
+        }, (response) => {
+            $scope.data0 = response.statusText;
+        })
+    }, (response) => {
+        $scope.data1 = response.statusText;
+    })
+}, (response) => {
+    $scope.data2 = response.statusText;
+});
+}
+});
+</script>
+</body>
+</html>
